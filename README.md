@@ -1,5 +1,41 @@
 # JiraForge
 
+<p align="center">
+  <a href="https://go.dev">
+    <img src="https://img.shields.io/badge/Built%20with-Go-00ADD8?style=flat-square&logo=go&logoColor=white" 
+         alt="Built with Go">
+  </a>
+
+  <a href="https://github.com/kriuchkov/jiraforge/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/kriuchkov/jiraforge?style=flat-square&color=blue" 
+        alt="License">
+  </a>
+
+  <a href="https://github.com/kriuchkov/jiraforge/stargazers">
+    <img src="https://img.shields.io/github/stars/kriuchkov/jiraforge?style=flat-square" 
+         alt="Stars">
+  </a>
+
+  <a href="https://www.atlassian.com/software/jira">
+    <img src="https://img.shields.io/badge/Integration-Jira-0052CC?style=flat-square&logo=jira&logoColor=white" 
+         alt="Jira Integration">
+  </a>
+
+  <a href="https://modelcontextprotocol.io">
+    <img src="https://img.shields.io/badge/Protocol-MCP-orange?style=flat-square" 
+    alt="MCP Protocol">
+  </a>
+
+  <a href="https://cursor.com/">
+      <img src="https://img.shields.io/badge/Compatible%20with-Cursor-5E5E5E?style=flat-square"
+       alt="Compatible with Cursor">
+  </a>
+
+  <a href="https://code.visualstudio.com/">
+      <img src="https://img.shields.io/badge/Compatible%20with-VS%20Code-007ACC?style=flat-square&logo=visual-studio-code&logoColor=white" alt="Compatible with VS Code">
+  </a>
+</p>
+
 JiraForge is a Jira operations layer for teams that want Jira available in AI clients, terminal workflows, and local automation without re-implementing the same integration three times.
 
 At a product level, JiraForge helps turn Jira from a browser-only workflow into a reusable tool surface. Instead of constantly switching between Jira UI, custom scripts, and AI tools, a team gets one consistent way to read issues, comments, sprints, statuses, versions, linked work, and development context, and to perform common write operations when needed.
