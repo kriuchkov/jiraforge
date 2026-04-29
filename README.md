@@ -29,22 +29,8 @@ Use `jiraforge-cli` when you want explicit, repeatable terminal commands. It is 
 Use `jiraforge-agent` when you want a chat-driven Jira assistant on top of the same local MCP tools. It is useful for multi-step requests such as summarizing an issue, checking related work and development state, or deciding on the next Jira action from a natural-language prompt. It does not add a separate Jira implementation; it adds Gemini-based reasoning and tool orchestration, and it requires `GOOGLE_API_KEY`.
 It also supports persistent chat sessions, so you can resume the same conversation later by user and session ID instead of starting from an empty context every time.
 
-## Why this layout
-
-The runtime is split into explicit layers:
-
-- [internal/config](internal/config): configuration loading and settings types
-- [internal/core](internal/core): domain models ([models/jira.go](internal/core/models/jira.go)), capability ports ([ports/service.go](internal/core/ports/service.go)), and typed errors ([errors/errors.go](internal/core/errors/errors.go))
-- [internal/services/jira](internal/services/jira): Jira use cases, including computed reports (aging, blocked, flow efficiency, sprint health)
-- [internal/adapters](internal/adapters): Atlassian gateway ([atlassian](internal/adapters/atlassian)), MCP transport ([mcp](internal/adapters/mcp)), Cobra CLI ([commands/cli](internal/adapters/commands/cli)), ADK session/recall tools ([adk](internal/adapters/adk)), text presentation ([presentation/text](internal/adapters/presentation/text)), and temp storage ([storage/temp](internal/adapters/storage/temp))
-- [internal/app](internal/app): runtime wiring and bootstrap helpers shared by every binary
-- [cmd/*](cmd): executable entrypoints ([jiraforge](cmd/jiraforge), [jiraforge-cli](cmd/jiraforge-cli), [jiraforge-agent](cmd/jiraforge-agent))
-
-Inbound and outbound Jira ports are split into narrow capability interfaces (`IssueQueryService`, `SprintService`, `ReportService`, `WorkflowService`, `RelationshipService`, `DevelopmentService`, …) with composite `JiraService` and `JiraGateway` for wiring. The Atlassian adapter is the only place that talks to Jira Cloud; MCP, CLI, and the Gemini agent all consume the same service, so business logic lives in exactly one place.
-
 ## Requirements
 
-- Go 1.26+
 - Atlassian Cloud host, email, and API token
 - `GOOGLE_API_KEY` only if you want to run the Gemini ADK agent
 
@@ -83,9 +69,9 @@ You can export them in the shell or place them in a local `.env` file and pass `
 ## Build
 
 ```bash
-just build
-just build-cli
-just build-agent
+make build
+make build-cli
+make build-agent
 ```
 
 Or directly:
@@ -203,7 +189,7 @@ export JIRAFORGE_TEST_LINK_TYPE=Relates
 Run only this layer:
 
 ```bash
-just test-atlassian-integration
+make test-atlassian-integration
 ```
 
 Or directly:
@@ -222,13 +208,13 @@ Store `ATLASSIAN_HOST`, `ATLASSIAN_EMAIL`, and `ATLASSIAN_TOKEN` as repository s
 Run in stdio mode:
 
 ```bash
-go run ./cmd/jiraforge --env .env
+jiraforge --env .env
 ```
 
 Run in HTTP mode for local debugging:
 
 ```bash
-go run ./cmd/jiraforge --env .env --http_port 3000
+jiraforge --env .env --http_port 3000
 ```
 
 Cursor or Claude Desktop MCP configuration for stdio mode:
@@ -308,7 +294,7 @@ Available prompts:
 Run help:
 
 ```bash
-go run ./cmd/jiraforge-cli --help
+jiraforge-cli --help
 ```
 
 Every command supports:
@@ -320,47 +306,47 @@ Examples:
 
 ```bash
 # issue inspection
-go run ./cmd/jiraforge-cli get-issue --env .env --issue-key PROJ-123
+jiraforge-cli get-issue --env .env --issue-key PROJ-123
 
 # search with JQL
-go run ./cmd/jiraforge-cli search-issues --env .env --jql "project = PROJ ORDER BY updated DESC" --max-results 20
+jiraforge-cli search-issues --env .env --jql "project = PROJ ORDER BY updated DESC" --max-results 20
 
 # create an issue
-go run ./cmd/jiraforge-cli create-issue --env .env \
+jiraforge-cli create-issue --env .env \
   --project-key PROJ \
   --summary "Fix login redirect" \
   --description "Users are redirected to the wrong page after login." \
   --issue-type Bug
 
 # add a comment
-go run ./cmd/jiraforge-cli add-comment --env .env --issue-key PROJ-123 --comment "Investigating the regression."
+jiraforge-cli add-comment --env .env --issue-key PROJ-123 --comment "Investigating the regression."
 
 # transition an issue
-go run ./cmd/jiraforge-cli transition-issue --env .env --issue-key PROJ-123 --transition-id 31
+jiraforge-cli transition-issue --env .env --issue-key PROJ-123 --transition-id 31
 
 # inspect linked development state
-go run ./cmd/jiraforge-cli get-development-info --env .env --issue-key PROJ-123
+jiraforge-cli get-development-info --env .env --issue-key PROJ-123
 
 # inspect a sprint report
-go run ./cmd/jiraforge-cli get-sprint-report --env .env --sprint-id 42
+jiraforge-cli get-sprint-report --env .env --sprint-id 42
 
 # inspect sprint health
-go run ./cmd/jiraforge-cli get-sprint-health-report --env .env --sprint-id 42
+jiraforge-cli get-sprint-health-report --env .env --sprint-id 42
 
 # find stale work in active statuses
-go run ./cmd/jiraforge-cli get-aging-report --env .env --project-key PROJ --status "In Progress" --status "Code Review" --min-days-in-status 5
+jiraforge-cli get-aging-report --env .env --project-key PROJ --status "In Progress" --status "Code Review" --min-days-in-status 5
 
 # inspect blocked work and dependencies
-go run ./cmd/jiraforge-cli get-blocked-issues-report --env .env --project-key PROJ --status "In Progress" --status "Blocked" --blocked-status "Blocked"
+jiraforge-cli get-blocked-issues-report --env .env --project-key PROJ --status "In Progress" --status "Blocked" --blocked-status "Blocked"
 
 # inspect weekly active-vs-blocked flow efficiency with assignee rollups
-go run ./cmd/jiraforge-cli get-flow-efficiency-report --env .env --project-key PROJ --status "In Progress" --status "Code Review" --status "Blocked" --active-status "In Progress" --active-status "Code Review" --blocked-status "Blocked" --window-days 7
+jiraforge-cli get-flow-efficiency-report --env .env --project-key PROJ --status "In Progress" --status "Code Review" --status "Blocked" --active-status "In Progress" --active-status "Code Review" --blocked-status "Blocked" --window-days 7
 
 # inspect an explicit review period instead of a rolling window
-go run ./cmd/jiraforge-cli get-flow-efficiency-report --env .env --project-key PROJ --status "In Progress" --status "Code Review" --status "Blocked" --active-status "In Progress" --active-status "Code Review" --blocked-status "Blocked" --start-date 2026-04-01 --end-date 2026-04-07
+jiraforge-cli get-flow-efficiency-report --env .env --project-key PROJ --status "In Progress" --status "Code Review" --status "Blocked" --active-status "In Progress" --active-status "Code Review" --blocked-status "Blocked" --start-date 2026-04-01 --end-date 2026-04-07
 
 # machine-readable output
-go run ./cmd/jiraforge-cli search-issues --env .env --jql "assignee = currentUser()" --output json
+jiraforge-cli search-issues --env .env --jql "assignee = currentUser()" --output json
 ```
 
 CLI commands:
@@ -406,43 +392,37 @@ The command now uses explicit subcommands: use `console` for terminal chat, `web
 Run the agent:
 
 ```bash
-go run ./cmd/jiraforge-agent console --env .env
+jiraforge-agent console --env .env
 ```
 
 Resume the latest session for a user:
 
 ```bash
-go run ./cmd/jiraforge-agent console --env .env --user-id alice --resume-last
+jiraforge-agent console --env .env --user-id alice --resume-last
 ```
 
 Create or reopen a named session:
 
 ```bash
-go run ./cmd/jiraforge-agent console --env .env --user-id alice --session-id release-audit
+jiraforge-agent console --env .env --user-id alice --session-id release-audit
 ```
 
 Override the model:
 
 ```bash
-go run ./cmd/jiraforge-agent console --env .env --model gemini-2.5-flash
-```
-
-By default the agent prefers a sibling `jiraforge` binary. If it cannot find one, it falls back to:
-
-```bash
-go run .
+jiraforge-agent console --env .env --model gemini-2.5-flash
 ```
 
 You can override that if you want to point ADK to another command:
 
 ```bash
-go run ./cmd/jiraforge-agent console --env .env --mcp-command jiraforge --mcp-args "--http_port 3000"
+jiraforge-agent console --env .env --mcp-command jiraforge --mcp-args "--http_port 3000"
 ```
 
 Change the session database location if needed:
 
 ```bash
-go run ./cmd/jiraforge-agent console --env .env --session-db ./var/jiraforge-agent.db
+jiraforge-agent console --env .env --session-db ./var/jiraforge-agent.db
 ```
 
 By default the session database lives in the user's config directory, for example under `~/Library/Application Support/jiraforge/` on macOS.
@@ -452,46 +432,18 @@ In addition to exact session resume, the agent can also recall relevant snippets
 Run the web launcher with additional ADK launcher arguments after `--`:
 
 ```bash
-go run ./cmd/jiraforge-agent web --env .env -- --host 127.0.0.1 --port 8080
+jiraforge-agent web --env .env -- --host 127.0.0.1 --port 8080
 ```
 
 You can manage the local session store directly without loading Jira or Gemini configuration:
 
 ```bash
-go run ./cmd/jiraforge-agent --session-db ./var/jiraforge-agent.db sessions list --user-id alice
-go run ./cmd/jiraforge-agent --session-db ./var/jiraforge-agent.db sessions inspect --user-id alice --session-id release-audit
-go run ./cmd/jiraforge-agent --session-db ./var/jiraforge-agent.db sessions delete --user-id alice --session-id release-audit
+jiraforge-agent --session-db ./var/jiraforge-agent.db sessions list --user-id alice
+jiraforge-agent --session-db ./var/jiraforge-agent.db sessions inspect --user-id alice --session-id release-audit
+jiraforge-agent --session-db ./var/jiraforge-agent.db sessions delete --user-id alice --session-id release-audit
 ```
 
 Mutating Jira tools require confirmation in the ADK toolset layer.
-
-## Docker
-
-Build the container:
-
-```bash
-docker build -t jiraforge .
-```
-
-Run in stdio mode:
-
-```bash
-docker run --rm -i \
-  -e ATLASSIAN_HOST=https://your-company.atlassian.net \
-  -e ATLASSIAN_EMAIL=your-email@company.com \
-  -e ATLASSIAN_TOKEN=your-api-token \
-  jiraforge
-```
-
-Run in HTTP mode:
-
-```bash
-docker run --rm -p 3000:3000 \
-  -e ATLASSIAN_HOST=https://your-company.atlassian.net \
-  -e ATLASSIAN_EMAIL=your-email@company.com \
-  -e ATLASSIAN_TOKEN=your-api-token \
-  jiraforge --http_port 3000
-```
 
 ## Development
 
