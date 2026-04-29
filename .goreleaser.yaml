@@ -1,0 +1,134 @@
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: jiraforge
+    main: ./cmd/jiraforge
+    binary: jiraforge
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X main.version={{.Version}}
+
+  - id: jiraforge-cli
+    main: ./cmd/jiraforge-cli
+    binary: jiraforge-cli
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X main.version={{.Version}}
+
+  - id: jiraforge-agent
+    main: ./cmd/jiraforge-agent
+    binary: jiraforge-agent
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X main.version={{.Version}}
+
+archives:
+  - id: jiraforge
+    ids:
+      - jiraforge
+    name_template: "jiraforge_{{ .Os }}_{{ .Arch }}"
+    formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+
+  - id: jiraforge-cli
+    ids:
+      - jiraforge-cli
+    name_template: "jiraforge-cli_{{ .Os }}_{{ .Arch }}"
+    formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+
+  - id: jiraforge-agent
+    ids:
+      - jiraforge-agent
+    name_template: "jiraforge-agent_{{ .Os }}_{{ .Arch }}"
+    formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+
+checksum:
+  name_template: "checksums.txt"
+
+brews:
+  - name: jiraforge
+    ids:
+      - jiraforge
+    repository:
+      owner: kriuchkov
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    homepage: "https://github.com/kriuchkov/jiraforge"
+    description: "JiraForge MCP server"
+    install: |
+      bin.install "jiraforge"
+
+  - name: jiraforge-cli
+    ids:
+      - jiraforge-cli
+    repository:
+      owner: kriuchkov
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    homepage: "https://github.com/kriuchkov/jiraforge"
+    description: "JiraForge CLI"
+    install: |
+      bin.install "jiraforge-cli"
+
+  - name: jiraforge-agent
+    ids:
+      - jiraforge-agent
+    repository:
+      owner: kriuchkov
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    homepage: "https://github.com/kriuchkov/jiraforge"
+    description: "JiraForge Gemini ADK agent"
+    install: |
+      bin.install "jiraforge-agent"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+# Trigger workflow

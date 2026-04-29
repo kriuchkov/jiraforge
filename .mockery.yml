@@ -1,0 +1,13 @@
+template: testify
+template-data:
+  unroll-variadic: true
+packages:
+  github.com/kriuchkov/jiraforge/internal/core/ports:
+    config:
+      dir: '{{.ConfigDir}}/internal/adapters/mcp/mocks'
+      structname: '{{.InterfaceName}}'
+      pkgname: mocks
+    interfaces:
+      JiraService:
+        config:
+          filename: jira_service.go
