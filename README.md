@@ -36,6 +36,28 @@
   </a>
 </p>
 
+<p align="center">
+  <a href="#what-jiraforge-helps-with"><strong>Features</strong></a>
+  <span>&nbsp;•&nbsp;</span>
+  <a href="#install"><strong>Install</strong></a>
+  <span>&nbsp;•&nbsp;</span>
+  <a href="#configuration"><strong>Configuration</strong></a>
+  <span>&nbsp;•&nbsp;</span>
+  <a href="#mcp-server"><strong>MCP</strong></a>
+  <span>&nbsp;•&nbsp;</span>
+  <a href="#cli"><strong>CLI</strong></a>
+  <span>&nbsp;•&nbsp;</span>
+  <a href="#gemini-agent-with-adk-go"><strong>Agent</strong></a>
+  <span>&nbsp;•&nbsp;</span>
+  <a href="#build"><strong>Build</strong></a>
+  <span>&nbsp;•&nbsp;</span>
+  <a href="#development"><strong>Development</strong></a>
+  <span>&nbsp;•&nbsp;</span>
+  <a href="#license"><strong>License</strong></a>
+</p>
+
+## Feature overview
+
 JiraForge is a Jira operations layer for teams that want Jira available in AI clients, terminal workflows, and local automation without re-implementing the same integration three times.
 
 At a product level, JiraForge helps turn Jira from a browser-only workflow into a reusable tool surface. Instead of constantly switching between Jira UI, custom scripts, and AI tools, a team gets one consistent way to read issues, comments, sprints, statuses, versions, linked work, and development context, and to perform common write operations when needed.
